@@ -1213,9 +1213,7 @@ ${symptomContext}
             </div>
           )}
           
-          <div className="mt-4 text-xs text-gray-500 text-center">
-            気軽にお話しください • Shift+Enter で改行 {isVoiceSupported && '• マイクボタンで音声入力'}
-          </div>
+
         </div>
       </div>
     </div>
