@@ -38,6 +38,7 @@ const PatientRegistration: React.FC<PatientRegistrationProps> = ({
         bloodType: savedPatientData.blood_type || savedPatientData.bloodType || '',
         phone: savedPatientData.phone || '',
         email: savedPatientData.email || userAccount?.email || '',
+        postalCode: savedPatientData.postal_code || savedPatientData.postalCode || '',
         address: savedPatientData.address || '',
         insuranceType: savedPatientData.insurance_type || '国民健康保険',
         insuranceNumber: savedPatientData.insurance_number || savedPatientData.insuranceNumber || '',
@@ -63,6 +64,7 @@ const PatientRegistration: React.FC<PatientRegistrationProps> = ({
       bloodType: '',
       phone: '',
       email: userAccount?.email || '',
+      postalCode: '',
       address: '',
       insuranceType: '国民健康保険',
       insuranceNumber: '',
@@ -80,6 +82,7 @@ const PatientRegistration: React.FC<PatientRegistrationProps> = ({
   });
   const [showAutoFillNotification, setShowAutoFillNotification] = useState(!!savedPatientData);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false);
 
   // Load profile data when user logs in
   React.useEffect(() => {
@@ -98,21 +101,31 @@ const PatientRegistration: React.FC<PatientRegistrationProps> = ({
       
       if (data) {
         // Auto-fill form with saved profile data
-        setFormData({
-          name: data.name || '',
-          birthDate: data.birth_date || data.birthDate || '',
-          gender: data.gender || '',
-          phone: data.phone || '',
-          email: data.email || userAccount?.email || '',
-          address: data.address || '',
-          insuranceType: data.insurance_type || '国民健康保険',
-          insuranceNumber: data.insurance_number || data.insuranceNumber || '',
+        setFormData(prev => ({
+          ...prev,
+          name: data.name || prev.name,
+          birthDate: data.birth_date || data.birthDate || prev.birthDate,
+          gender: data.gender || prev.gender,
+          height: data.height || prev.height,
+          weight: data.weight || prev.weight,
+          bloodType: data.blood_type || data.bloodType || prev.bloodType,
+          phone: data.phone || prev.phone,
+          email: data.email || prev.email,
+          postalCode: data.postal_code || data.postalCode || prev.postalCode,
+          address: data.address || prev.address,
+          insuranceType: data.insurance_type || prev.insuranceType,
+          insuranceNumber: data.insurance_number || data.insuranceNumber || prev.insuranceNumber,
+          medicalHistory: data.medical_history || data.medicalHistory || prev.medicalHistory,
+          currentMedications: data.current_medications || data.currentMedications || prev.currentMedications,
+          allergies: data.allergies || prev.allergies,
+          smokingStatus: data.smoking_status || data.smokingStatus || prev.smokingStatus,
+          drinkingStatus: data.drinking_status || data.drinkingStatus || prev.drinkingStatus,
           emergencyContact: {
-            name: data.emergency_contact_name || data.emergencyContact?.name || '',
-            phone: data.emergency_contact_phone || data.emergencyContact?.phone || '',
-            relationship: data.emergency_contact_relationship || data.emergencyContact?.relationship || ''
+            name: data.emergency_contact_name || data.emergencyContact?.name || prev.emergencyContact.name,
+            phone: data.emergency_contact_phone || data.emergencyContact?.phone || prev.emergencyContact.phone,
+            relationship: data.emergency_contact_relationship || data.emergencyContact?.relationship || prev.emergencyContact.relationship
           }
-        });
+        }));
         setShowAutoFillNotification(true);
       }
     } catch (error) {
@@ -121,6 +134,37 @@ const PatientRegistration: React.FC<PatientRegistrationProps> = ({
       setIsLoadingProfile(false);
     }
   };
+
+  // 郵便番号から住所を取得する関数
+  const fetchAddressFromPostalCode = async (postalCode: string) => {
+    if (!postalCode || postalCode.length < 7) return;
+    
+    setIsLoadingAddress(true);
+    try {
+      // 郵便番号をハイフンなしの7桁に正規化
+      const normalizedPostalCode = postalCode.replace(/[^\d]/g, '').slice(0, 7);
+      
+      if (normalizedPostalCode.length === 7) {
+        const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${normalizedPostalCode}`);
+        const data = await response.json();
+        
+        if (data.results && data.results.length > 0) {
+          const result = data.results[0];
+          const fullAddress = `${result.address1}${result.address2}${result.address3}`;
+          
+          setFormData(prev => ({
+            ...prev,
+            address: fullAddress
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch address:', error);
+    } finally {
+      setIsLoadingAddress(false);
+    }
+  };
+
   // 自動入力通知を3秒後に非表示
   React.useEffect(() => {
     if (showAutoFillNotification) {
@@ -145,10 +189,28 @@ const PatientRegistration: React.FC<PatientRegistrationProps> = ({
         }
       }));
     } else {
+      // 郵便番号の場合はハイフンを自動挿入
+      let processedValue = value;
+      if (field === 'postalCode') {
+        const digitsOnly = value.replace(/[^\d]/g, '');
+        if (digitsOnly.length <= 3) {
+          processedValue = digitsOnly;
+        } else if (digitsOnly.length <= 7) {
+          processedValue = `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3)}`;
+        } else {
+          processedValue = `${digitsOnly.slice(0, 3)}-${digitsOnly.slice(3, 7)}`;
+        }
+      }
+      
       setFormData(prev => ({
         ...prev,
-        [field]: value
+        [field]: processedValue
       }));
+      
+      // 郵便番号が入力された場合、住所を自動取得
+      if (field === 'postalCode' && processedValue.replace(/[^\d]/g, '').length >= 7) {
+        fetchAddressFromPostalCode(processedValue);
+      }
     }
   };
 
@@ -530,6 +592,29 @@ const PatientRegistration: React.FC<PatientRegistrationProps> = ({
         {/* Step 2: Insurance Information */}
         {step === 2 && (
           <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <MapPin size={16} className="inline mr-2" />
+                郵便番号
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={formData.postalCode}
+                  onChange={(e) => handleInputChange('postalCode', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors"
+                  placeholder="123-4567"
+                  maxLength={8}
+                />
+                {isLoadingAddress && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">郵便番号を入力すると住所が自動で入力されます</p>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <MapPin size={16} className="inline mr-2" />
