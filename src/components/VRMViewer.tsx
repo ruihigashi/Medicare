@@ -504,7 +504,7 @@ const VRMViewer = forwardRef<VRMViewerRef, VRMViewerProps>(({ isSpeaking = false
   }, [isSpeaking]);
 
   return (
-    <div ref={mountRef} className="w-full h-screen relative">
+    <div ref={mountRef} className="w-full h-full relative">
       {/* Loading overlay */}
       {isLoading && (
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-10">
