@@ -293,7 +293,7 @@ const DoctorAIConsultation: React.FC<DoctorAIConsultationProps> = ({
         </div>
 
         {/* Top/Bottom on mobile, Side by side on desktop: AI Assistant VRM Avatar */}
-        <div className="w-full lg:w-1/2 p-2 lg:p-4 h-1/2 lg:h-full">
+        <div className="w-full lg:w-1/2 p-2 lg:p-4 h-1/2 lg:h-full min-h-[250px]">
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden h-full flex flex-col">
             <div className="p-3 lg:p-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white flex-shrink-0">
               <div className="flex items-center gap-2 lg:gap-3">

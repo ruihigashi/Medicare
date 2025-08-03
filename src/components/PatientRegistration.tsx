@@ -625,7 +625,7 @@ const PatientRegistration: React.FC<PatientRegistrationProps> = ({
                 onChange={(e) => handleInputChange('address', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors"
                 rows={3}
-                placeholder="〒123-4567 東京都渋谷区..."
+                placeholder="東京都渋谷区..."
               />
             </div>
 

@@ -64,8 +64,15 @@ const VRMViewer = forwardRef<VRMViewerRef, VRMViewerProps>(({ isSpeaking = false
 
     // Camera
     const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    camera.position.set(0, 1.7, -0.8);
-    camera.lookAt(0, 1.5, 0);
+    // スマホではより近い位置にカメラを配置
+    const isMobile = width < 768;
+    if (isMobile) {
+      camera.position.set(0, 1.5, -0.6);
+      camera.lookAt(0, 1.3, 0);
+    } else {
+      camera.position.set(0, 1.7, -0.8);
+      camera.lookAt(0, 1.5, 0);
+    }
     cameraRef.current = camera;
 
     // Renderer
@@ -321,7 +328,15 @@ const VRMViewer = forwardRef<VRMViewerRef, VRMViewerProps>(({ isSpeaking = false
         // Position the VRM
         vrm.scene.position.set(0, -0.3, 0);
         vrm.scene.rotation.y = Math.PI; // Try 180 degrees rotation
-        vrm.scene.scale.set(1.3, 1.3, 1.3); // Make avatar 30% larger
+        
+        // スマホではより小さくスケール
+        const isMobile = mountRef.current?.clientWidth && mountRef.current.clientWidth < 768;
+        if (isMobile) {
+          vrm.scene.scale.set(1.0, 1.0, 1.0); // スマホでは標準サイズ
+        } else {
+          vrm.scene.scale.set(1.3, 1.3, 1.3); // デスクトップでは30%拡大
+        }
+        
         vrm.scene.castShadow = true;
         vrm.scene.receiveShadow = true;
 
@@ -442,7 +457,14 @@ const VRMViewer = forwardRef<VRMViewerRef, VRMViewerProps>(({ isSpeaking = false
     avatarGroup.add(rightLeg);
 
     // Add to scene
-    avatarGroup.position.set(0, -0.3, 0);
+    const isMobile = mountRef.current?.clientWidth && mountRef.current.clientWidth < 768;
+    if (isMobile) {
+      avatarGroup.position.set(0, -0.2, 0);
+      avatarGroup.scale.set(0.8, 0.8, 0.8); // スマホでは小さく
+    } else {
+      avatarGroup.position.set(0, -0.3, 0);
+      avatarGroup.scale.set(1.0, 1.0, 1.0); // デスクトップでは標準サイズ
+    }
     sceneRef.current.add(avatarGroup);
 
     // Store reference for animation
@@ -504,7 +526,7 @@ const VRMViewer = forwardRef<VRMViewerRef, VRMViewerProps>(({ isSpeaking = false
   }, [isSpeaking]);
 
   return (
-    <div ref={mountRef} className="w-full h-full relative">
+    <div ref={mountRef} className="w-full h-full min-h-[200px] sm:min-h-[300px] lg:min-h-[400px] relative">
       {/* Loading overlay */}
       {isLoading && (
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-10">
