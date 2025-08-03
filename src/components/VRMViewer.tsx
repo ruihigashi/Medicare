@@ -67,8 +67,8 @@ const VRMViewer = forwardRef<VRMViewerRef, VRMViewerProps>(({ isSpeaking = false
     // スマホではより近い位置にカメラを配置
     const isMobile = width < 768;
     if (isMobile) {
-      camera.position.set(0, 1.5, -0.6);
-      camera.lookAt(0, 1.3, 0);
+      camera.position.set(0, 1.6, -0.4);
+      camera.lookAt(0, 1.6, 0);
     } else {
       camera.position.set(0, 1.7, -0.8);
       camera.lookAt(0, 1.5, 0);
@@ -326,16 +326,15 @@ const VRMViewer = forwardRef<VRMViewerRef, VRMViewerProps>(({ isSpeaking = false
         }
 
         // Position the VRM
-        vrm.scene.position.set(0, -0.3, 0);
-        vrm.scene.rotation.y = Math.PI; // Try 180 degrees rotation
-        
-        // スマホではより小さくスケール
         const isMobile = mountRef.current?.clientWidth && mountRef.current.clientWidth < 768;
         if (isMobile) {
-          vrm.scene.scale.set(1.0, 1.0, 1.0); // スマホでは標準サイズ
+          vrm.scene.position.set(0, -0.1, 0); // スマホでは少し高い位置
+          vrm.scene.scale.set(0.9, 0.9, 0.9); // スマホでは少し小さく
         } else {
+          vrm.scene.position.set(0, -0.3, 0);
           vrm.scene.scale.set(1.3, 1.3, 1.3); // デスクトップでは30%拡大
         }
+        vrm.scene.rotation.y = Math.PI; // Try 180 degrees rotation
         
         vrm.scene.castShadow = true;
         vrm.scene.receiveShadow = true;
@@ -459,8 +458,8 @@ const VRMViewer = forwardRef<VRMViewerRef, VRMViewerProps>(({ isSpeaking = false
     // Add to scene
     const isMobile = mountRef.current?.clientWidth && mountRef.current.clientWidth < 768;
     if (isMobile) {
-      avatarGroup.position.set(0, -0.2, 0);
-      avatarGroup.scale.set(0.8, 0.8, 0.8); // スマホでは小さく
+      avatarGroup.position.set(0, 0.1, 0); // スマホでは顔が窓枠に来るように調整
+      avatarGroup.scale.set(0.7, 0.7, 0.7); // スマホでは小さく
     } else {
       avatarGroup.position.set(0, -0.3, 0);
       avatarGroup.scale.set(1.0, 1.0, 1.0); // デスクトップでは標準サイズ

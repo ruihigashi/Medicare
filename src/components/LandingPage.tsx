@@ -238,29 +238,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onShowLogin, on
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-20 bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-white mb-2">10,000+</div>
-              <div className="text-gray-300">診療実績</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white mb-2">50+</div>
-              <div className="text-gray-300">専門医師</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white mb-2">4.9</div>
-              <div className="text-gray-300">満足度評価</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white mb-2">24/7</div>
-              <div className="text-gray-300">サポート体制</div>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* CTA Section */}
       <section className="py-20 bg-blue-600">
