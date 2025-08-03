@@ -965,9 +965,9 @@ ${symptomContext}
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* 3D Viewer Section */}
-      <div className="flex-1 relative">
+    <div className="min-h-screen bg-gray-100 flex flex-col lg:flex-row">
+      {/* 3D Viewer Section - Hidden on mobile, shown on desktop */}
+      <div className="hidden lg:block flex-1 relative">
         <VRMViewer ref={vrmViewerRef} isSpeaking={isSpeaking} />
         
         {/* Floating controls */}
@@ -986,9 +986,9 @@ ${symptomContext}
       </div>
 
       {/* Enhanced Chat Panel */}
-      <div className="w-[480px] bg-white border-l border-gray-200 flex flex-col shadow-lg">
+      <div className="w-full lg:w-[480px] bg-white border-l border-gray-200 flex flex-col shadow-lg">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 bg-blue-50">
+        <div className="p-4 lg:p-6 border-b border-gray-200 bg-blue-50">
           {isQuestionnaire && onBackToWaiting && (
             <button
               onClick={onBackToWaiting}
@@ -999,8 +999,21 @@ ${symptomContext}
             </button>
           )}
           
-          <div className="flex items-center gap-4">
-            <div className="relative">
+          <div className="flex items-center gap-3 lg:gap-4">
+            {/* Mobile Avatar - Small 3D viewer */}
+            <div className="lg:hidden w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center relative overflow-hidden border-2 border-white shadow-lg">
+              <div className="w-full h-full rounded-full overflow-hidden">
+                <VRMViewer ref={vrmViewerRef} isSpeaking={isSpeaking} />
+              </div>
+              {isSpeaking && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full animate-pulse border-2 border-white">
+                  <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-75"></div>
+                </div>
+              )}
+            </div>
+            
+            {/* Desktop Icon */}
+            <div className="hidden lg:block relative">
               <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
                 {isQuestionnaire ? <FileText className="text-white" size={24} /> : <MessageCircle className="text-white" size={24} />}
               </div>
@@ -1010,32 +1023,33 @@ ${symptomContext}
                 </div>
               )}
             </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
+            
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg lg:text-2xl font-bold text-gray-900 truncate">
                 {isQuestionnaire ? '問診アシスタント' : 'AIアバター'}
               </h2>
-              <p className="text-gray-600 text-sm flex items-center gap-2 mt-1">
+              <p className="text-gray-600 text-xs lg:text-sm flex items-center gap-2 mt-1">
                 {isSpeaking ? (
                   <>
                     <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-green-500 rounded-full animate-bounce"></div>
+                      <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                     </div>
                     <span className="font-medium">お話し中...</span>
                   </>
                 ) : isTyping ? (
                   <>
                     <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                      <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
                     </div>
                     <span className="font-medium">考え中...</span>
                   </>
                 ) : (
                   <>
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-green-500 rounded-full"></div>
                     <span className="font-medium">お話しできます</span>
                   </>
                 )}
@@ -1044,21 +1058,21 @@ ${symptomContext}
           </div>
           
           {isQuestionnaire && (
-            <div className="mt-6">
+            <div className="mt-4 lg:mt-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600 font-medium">
+                <span className="text-xs lg:text-sm text-gray-600 font-medium">
                   質問 {Math.min(currentQuestionIndex + 1, medicalQuestions.length)} / {medicalQuestions.length}
                 </span>
                 {isQuestionnaireComplete && (
-                  <div className="flex items-center gap-2 text-green-700 bg-green-100 px-3 py-1 rounded-full">
-                    <CheckCircle size={16} />
-                    <span className="text-sm font-medium">完了</span>
+                  <div className="flex items-center gap-1 lg:gap-2 text-green-700 bg-green-100 px-2 lg:px-3 py-1 rounded-full">
+                    <CheckCircle size={12} className="lg:w-4 lg:h-4" />
+                    <span className="text-xs lg:text-sm font-medium">完了</span>
                   </div>
                 )}
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+              <div className="w-full bg-gray-200 rounded-full h-2 lg:h-3 overflow-hidden">
                 <div 
-                  className="bg-blue-600 h-3 rounded-full transition-all duration-700 ease-out"
+                  className="bg-blue-600 h-2 lg:h-3 rounded-full transition-all duration-700 ease-out"
                   style={{ 
                     width: `${isQuestionnaireComplete ? 100 : (currentQuestionIndex / medicalQuestions.length) * 100}%` 
                   }}
@@ -1069,7 +1083,7 @@ ${symptomContext}
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent bg-gray-50 max-h-[calc(100vh-400px)]">
+        <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4 lg:space-y-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent bg-gray-50 max-h-[calc(100vh-400px)]">
           {messages.map((message, index) => (
             <div
               key={message.id}
@@ -1131,7 +1145,7 @@ ${symptomContext}
         </div>
 
         {/* Enhanced Input */}
-        <div className="flex-shrink-0 p-6 border-t border-gray-200 bg-white">
+        <div className="flex-shrink-0 p-4 lg:p-6 border-t border-gray-200 bg-white">
           {isQuestionnaireComplete && (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
               <div className="flex items-center gap-3">
